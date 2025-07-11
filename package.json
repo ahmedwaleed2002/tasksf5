@@ -1,14 +1,23 @@
 {
-  "name": "tasksf4",
+  "name": "file-explorer-cli",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "file-explorer.js",
   "scripts": {
+    "start": "node file-explorer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["cli", "file-explorer", "directory", "recursive", "nodejs"],
+  "author": "Ahmed Waleed",
   "license": "ISC",
-  "description": "",
+  "description": "A Node.js CLI tool that recursively explores directories and lists files with their sizes",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ahmedwaleed2002/tasksf5.git"
+  },
+  "homepage": "https://github.com/ahmedwaleed2002/tasksf5",
+  "bugs": {
+    "url": "https://github.com/ahmedwaleed2002/tasksf5/issues"
+  },
   "dependencies": {
     "chalk": "^4.1.2"
   }
