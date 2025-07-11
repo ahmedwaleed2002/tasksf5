@@ -4,12 +4,14 @@ A powerful Node.js command-line tool that recursively explores directories and p
 
 ## 🚀 Features
 
-- **Recursive Directory Exploration**: Automatically explores all subdirectories
+- **Interactive Directory Exploration**: Shows main files and folders first, then asks for permission to explore subdirectories
+- **Smart Recursive Exploration**: Only explores subdirectories when you want to
 - **File Information Display**: Shows file sizes in bytes
 - **Colorful Output**: Uses chalk for beautiful, color-coded terminal output
 - **Cross-Platform Compatibility**: Works on Windows, macOS, and Linux
 - **Dynamic Input**: Accepts any directory path as a command-line argument
 - **Error Handling**: Gracefully handles non-existent directories
+- **User-Friendly Interface**: Clean, organized output with clear sections
 
 ## 📦 Installation
 
@@ -80,12 +82,26 @@ The tool displays information in a color-coded format:
 ### Example Output:
 ```
 Exploring directory: ./sample-folder
-./sample-folder (Directory)
+--- Main files and folders ---
+
 ./sample-folder/document.txt (File - 1024 bytes)
 ./sample-folder/images (Directory)
-./sample-folder/images/photo.jpg (File - 2048576 bytes)
 ./sample-folder/scripts (Directory)
+./sample-folder/config.json (File - 256 bytes)
+
+Do you want to explore subdirectories? (y/n): y
+
+--- Exploring subdirectories ---
+
+Exploring subdirectory: ./sample-folder/images
+./sample-folder/images/photo.jpg (File - 2048576 bytes)
+./sample-folder/images/banner.png (File - 1024000 bytes)
+
+Exploring subdirectory: ./sample-folder/scripts
 ./sample-folder/scripts/script.js (File - 512 bytes)
+./sample-folder/scripts/utils.js (File - 256 bytes)
+
+--- Exploration complete! ---
 ```
 
 ## 🛠️ Technical Details
@@ -95,6 +111,7 @@ Exploring directory: ./sample-folder
 - **fs module**: File system operations
 - **path module**: Cross-platform path handling
 - **chalk**: Terminal string styling
+- **readline**: Interactive user input handling
 
 ### Key Functions
 
@@ -103,17 +120,23 @@ Exploring directory: ./sample-folder
 - Uses `stats.isDirectory()` and `stats.isFile()` for type detection
 - Applies appropriate colors based on file type
 
-#### `exploreDirectory(dirPath)`
-- Recursively explores directories
+#### `askToExploreSubdirectories()`
+- Interactive function that prompts user for subdirectory exploration
+- Returns a Promise that resolves to user's choice (y/n)
+- Uses readline interface for clean user interaction
+
+#### `exploreDirectory(dirPath, exploreSubdirs)`
+- Intelligently explores directories with user confirmation
 - Uses `fs.readdirSync()` to read directory contents
 - Calls `fs.statSync()` to get file statistics
-- Implements recursive calls for subdirectories
+- Implements conditional recursive calls based on user preference
+- Separates main directory listing from subdirectory exploration
 
 #### `startFileExplorer()`
-- Entry point function
+- Async entry point function
 - Handles command-line argument parsing
 - Validates directory existence
-- Initiates directory exploration
+- Initiates directory exploration with proper cleanup
 
 ## 🔧 Development
 
