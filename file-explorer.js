@@ -9,12 +9,40 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
+// Global statistics tracking
+let totalFiles = 0;
+let totalDirectories = 0;
+let totalSize = 0;
+
+// Function to update statistics
+function updateStats(stats) {
+  if (stats.isFile()) {
+    totalFiles++;
+    totalSize += stats.size;
+  } else if (stats.isDirectory()) {
+    totalDirectories++;
+  }
+}
+
+// Function to format file sizes in human-readable format
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
 // Function to display information about files and directories
 function displayFileInfo(filePath, stats) {
+  // Update statistics
+  updateStats(stats);
+  
   if (stats.isDirectory()) {
     console.log(chalk.blue.bold(filePath) + chalk.green(' (Directory)'));
   } else if (stats.isFile()) {
-    console.log(chalk.cyan.bold(filePath) + chalk.yellow(` (File - ${stats.size} bytes)`));
+    const sizeFormatted = formatFileSize(stats.size);
+    console.log(chalk.cyan.bold(filePath) + chalk.yellow(` (File - ${sizeFormatted})`));
   }
 }
 
@@ -29,20 +57,45 @@ function askToExploreSubdirectories() {
 
 // Function to explore directory with user confirmation for subdirectories
 async function exploreDirectory(dirPath, exploreSubdirs = false) {
-  const files = fs.readdirSync(dirPath); // Get directory contents
+  let files;
+  
+  try {
+    files = fs.readdirSync(dirPath); // Get directory contents
+  } catch (error) {
+    console.log(chalk.red(`Error reading directory ${dirPath}: ${error.message}`));
+    return;
+  }
+  
   const directories = [];
+  const fileStats = [];
 
-  // First, display all files and directories in the current level
+  // First, collect all file stats and separate files from directories
   files.forEach(file => {
-    const filePath = path.join(dirPath, file); // Get full path of each item
-    const stats = fs.statSync(filePath); // Get file stats
-
-    displayFileInfo(filePath, stats);
-
-    // Keep track of directories for potential exploration
-    if (stats.isDirectory()) {
-      directories.push(filePath);
+    const filePath = path.join(dirPath, file);
+    
+    try {
+      const stats = fs.statSync(filePath);
+      fileStats.push({ filePath, stats });
+      
+      if (stats.isDirectory()) {
+        directories.push(filePath);
+      }
+    } catch (error) {
+      console.log(chalk.red(`Error reading ${filePath}: ${error.message}`));
     }
+  });
+
+  // Sort files and directories for better display
+  fileStats.sort((a, b) => {
+    // Directories first, then files
+    if (a.stats.isDirectory() && !b.stats.isDirectory()) return -1;
+    if (!a.stats.isDirectory() && b.stats.isDirectory()) return 1;
+    return a.filePath.localeCompare(b.filePath);
+  });
+
+  // Display sorted files and directories
+  fileStats.forEach(({ filePath, stats }) => {
+    displayFileInfo(filePath, stats);
   });
 
   // If there are subdirectories and we haven't been told to explore them yet
@@ -66,9 +119,23 @@ async function exploreDirectory(dirPath, exploreSubdirs = false) {
   }
 }
 
+// Function to display summary statistics
+function displaySummary() {
+  console.log(chalk.green('\n--- Summary ---'));
+  console.log(chalk.cyan(`Total Files: ${totalFiles}`));
+  console.log(chalk.blue(`Total Directories: ${totalDirectories}`));
+  console.log(chalk.yellow(`Total Size: ${formatFileSize(totalSize)}`));
+  console.log(chalk.green('--- Exploration complete! ---'));
+}
+
 // Function to start the file explorer from the given directory
 async function startFileExplorer() {
   const directory = process.argv[2] || '.'; // Default to current directory
+
+  // Reset statistics
+  totalFiles = 0;
+  totalDirectories = 0;
+  totalSize = 0;
 
   // Check if the directory exists
   if (!fs.existsSync(directory)) {
@@ -82,7 +149,7 @@ async function startFileExplorer() {
   
   await exploreDirectory(directory); // Start exploring the directory
   
-  console.log(chalk.green('\n--- Exploration complete! ---'));
+  displaySummary();
   rl.close();
 }
 

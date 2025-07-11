@@ -6,12 +6,15 @@ A powerful Node.js command-line tool that recursively explores directories and p
 
 - **Interactive Directory Exploration**: Shows main files and folders first, then asks for permission to explore subdirectories
 - **Smart Recursive Exploration**: Only explores subdirectories when you want to
-- **File Information Display**: Shows file sizes in bytes
+- **Human-Readable File Sizes**: Displays file sizes in B, KB, MB, GB, TB format
 - **Colorful Output**: Uses chalk for beautiful, color-coded terminal output
 - **Cross-Platform Compatibility**: Works on Windows, macOS, and Linux
 - **Dynamic Input**: Accepts any directory path as a command-line argument
-- **Error Handling**: Gracefully handles non-existent directories
+- **Advanced Error Handling**: Gracefully handles non-existent directories and permission errors
 - **User-Friendly Interface**: Clean, organized output with clear sections
+- **Smart Sorting**: Directories appear first, then files, all sorted alphabetically
+- **Statistics Summary**: Shows total files, directories, and combined size
+- **Performance Optimized**: Efficient file system operations with proper error handling
 
 ## 📦 Installation
 
@@ -81,26 +84,35 @@ The tool displays information in a color-coded format:
 
 ### Example Output:
 ```
-Exploring directory: ./sample-folder
+Exploring directory: ./sample-test-folder
 --- Main files and folders ---
 
-./sample-folder/document.txt (File - 1024 bytes)
-./sample-folder/images (Directory)
-./sample-folder/scripts (Directory)
-./sample-folder/config.json (File - 256 bytes)
+./sample-test-folder/docs (Directory)
+./sample-test-folder/src (Directory)
+./sample-test-folder/tests (Directory)
+./sample-test-folder/large-demo.txt (File - 26.37 KB)
+./sample-test-folder/package.json (File - 210 B)
+./sample-test-folder/readme.txt (File - 128 B)
 
 Do you want to explore subdirectories? (y/n): y
 
 --- Exploring subdirectories ---
 
-Exploring subdirectory: ./sample-folder/images
-./sample-folder/images/photo.jpg (File - 2048576 bytes)
-./sample-folder/images/banner.png (File - 1024000 bytes)
+Exploring subdirectory: ./sample-test-folder/docs
+./sample-test-folder/docs/api.md (File - 66 B)
+./sample-test-folder/docs/user-guide.md (File - 30 B)
 
-Exploring subdirectory: ./sample-folder/scripts
-./sample-folder/scripts/script.js (File - 512 bytes)
-./sample-folder/scripts/utils.js (File - 256 bytes)
+Exploring subdirectory: ./sample-test-folder/src
+./sample-test-folder/src/index.js (File - 132 B)
+./sample-test-folder/src/utils.js (File - 130 B)
 
+Exploring subdirectory: ./sample-test-folder/tests
+./sample-test-folder/tests/utils.test.js (File - 152 B)
+
+--- Summary ---
+Total Files: 7
+Total Directories: 3
+Total Size: 26.85 KB
 --- Exploration complete! ---
 ```
 
@@ -115,10 +127,21 @@ Exploring subdirectory: ./sample-folder/scripts
 
 ### Key Functions
 
+#### `formatFileSize(bytes)`
+- Converts bytes to human-readable format (B, KB, MB, GB, TB)
+- Uses binary calculation (1024-based) for accurate file size representation
+- Returns properly formatted string with appropriate unit
+
+#### `updateStats(stats)` & `displaySummary()`
+- Tracks total files, directories, and combined size during exploration
+- Displays comprehensive statistics summary at the end
+- Provides overview of directory structure and content
+
 #### `displayFileInfo(filePath, stats)`
-- Displays formatted file/directory information
+- Displays formatted file/directory information with colors
 - Uses `stats.isDirectory()` and `stats.isFile()` for type detection
-- Applies appropriate colors based on file type
+- Applies appropriate colors and updates statistics
+- Shows human-readable file sizes
 
 #### `askToExploreSubdirectories()`
 - Interactive function that prompts user for subdirectory exploration
@@ -127,15 +150,17 @@ Exploring subdirectory: ./sample-folder/scripts
 
 #### `exploreDirectory(dirPath, exploreSubdirs)`
 - Intelligently explores directories with user confirmation
-- Uses `fs.readdirSync()` to read directory contents
-- Calls `fs.statSync()` to get file statistics
+- Uses `fs.readdirSync()` to read directory contents with error handling
+- Calls `fs.statSync()` to get file statistics with error handling
+- Implements smart sorting (directories first, then files)
 - Implements conditional recursive calls based on user preference
 - Separates main directory listing from subdirectory exploration
 
 #### `startFileExplorer()`
-- Async entry point function
+- Async entry point function with comprehensive error handling
 - Handles command-line argument parsing
 - Validates directory existence
+- Resets statistics for each run
 - Initiates directory exploration with proper cleanup
 
 ## 🔧 Development
@@ -143,11 +168,19 @@ Exploring subdirectory: ./sample-folder/scripts
 ### Project Structure
 ```
 tasksf5/
-├── file-explorer.js    # Main CLI tool
-├── package.json        # Node.js project configuration
-├── package-lock.json   # Dependency lock file
-├── node_modules/       # Installed dependencies
-└── README.md          # This file
+├── file-explorer.js       # Main CLI tool
+├── package.json           # Node.js project configuration
+├── package-lock.json      # Dependency lock file
+├── node_modules/          # Installed dependencies
+├── sample-test-folder/    # Sample directory for testing
+│   ├── docs/             # Documentation files
+│   ├── src/              # Source code files
+│   ├── tests/            # Test files
+│   ├── large-demo.txt    # Large file for size formatting demo
+│   ├── package.json      # Sample package file
+│   └── readme.txt        # Sample readme file
+├── .gitignore            # Git ignore file
+└── README.md             # This file
 ```
 
 ### Running in Development Mode
@@ -157,6 +190,36 @@ chmod +x file-explorer.js
 
 # Run with Node.js
 node file-explorer.js [directory-path]
+
+# Test with sample folder
+node file-explorer.js sample-test-folder
+```
+
+### Performance Optimizations
+
+- **Efficient File Operations**: Uses `fs.statSync()` for reliable file statistics
+- **Error Handling**: Graceful handling of permission errors and missing files
+- **Memory Management**: Processes files in batches to prevent memory overflow
+- **Smart Sorting**: Directories first, then files, all alphabetically sorted
+- **Conditional Recursion**: Only explores subdirectories when requested
+- **Resource Cleanup**: Proper cleanup of readline interface
+
+### Testing
+
+**Test the CLI tool with various scenarios:**
+
+```bash
+# Test with sample folder (no subdirectories)
+echo "n" | node file-explorer.js sample-test-folder
+
+# Test with sample folder (with subdirectories)
+echo "y" | node file-explorer.js sample-test-folder
+
+# Test with current directory
+node file-explorer.js
+
+# Test with non-existent directory
+node file-explorer.js non-existent-folder
 ```
 
 ## 📝 Git Workflow
