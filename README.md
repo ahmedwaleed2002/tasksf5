@@ -1,6 +1,19 @@
-# 📁 File Explorer CLI Tool
+## 📁 File Explorer CLI Tool
+
+**Day 5 Task: Recursive file reading, fs.statSync, terminal formatting (chalk)**
 
 A powerful Node.js command-line tool that recursively explores directories and provides detailed information about files and folders, including their sizes and types.
+
+## ✅ Day 5 Task Requirements
+
+This project fulfills all Day 5 learning objectives:
+
+1. **✅ Recursive File Reading**: Implemented with interactive user confirmation for subdirectory exploration
+2. **✅ fs.statSync Usage**: Used throughout for file type detection, size calculation, and metadata retrieval
+3. **✅ Terminal Formatting (chalk)**: Full color-coded output with blue directories, cyan files, yellow sizes, etc.
+4. **✅ File Explorer CLI**: Complete CLI tool that lists files and folders with their sizes
+5. **✅ Demo Command Output**: Comprehensive demo examples included in documentation
+6. **✅ GitHub with Sample Test Folder**: Repository includes sample-test-folder for demonstration
 
 ## 🚀 Features
 
@@ -256,13 +269,16 @@ The tool includes robust error handling:
 ## 🔮 Future Enhancements
 
 - [ ] Add file type filtering options
-- [ ] Implement size formatting (KB, MB, GB)
-- [ ] Add sorting options (by size, name, date)
+- [✓] ~~Implement size formatting (KB, MB, GB)~~ - **COMPLETED**
+- [✓] ~~Add sorting options (by name)~~ - **COMPLETED** 
 - [ ] Include last modified date information
 - [ ] Add depth limit option for recursion
 - [ ] Export results to JSON/CSV format
 - [ ] Add progress bar for large directories
 - [ ] Implement ignore patterns (.gitignore style)
+- [✓] ~~Interactive user confirmation~~ - **COMPLETED**
+- [✓] ~~Statistics summary~~ - **COMPLETED**
+- [✓] ~~Error handling improvements~~ - **COMPLETED**
 
 ## 🤝 Contributing
 
